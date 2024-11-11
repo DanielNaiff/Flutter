@@ -1,80 +1,129 @@
 import 'package:flutter/material.dart';
-import 'package:gerencia_de_estado_raiz_2/pokemon_model.dart';
-import 'package:gerencia_de_estado_raiz_2/pokemon_service.dart';
+import 'package:gerencia_de_estado_raiz_2/pokemon_state.dart';
+import 'package:gerencia_de_estado_raiz_2/pokemon_store.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomePage extends StatelessWidget {
+  HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+  final store = PokemonStore();
 
-class _HomePageState extends State<HomePage> {
-  final service = PokemonService();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-  var isLoading = false;
-  var error = '';
-  var pokemons = <Pokemon>[];
-
-  getPokemons() async {
-    setState(() {
-      isLoading = true;
-      error = '';
-    });
-
-    try {
-      final fetchedPokemons = await service.fetchAll();
-      setState(() {
-        pokemons = fetchedPokemons;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-        isLoading = false;
-      });
-    }
-  }
+  //   store.addListener(() {
+  //     setState(() {});
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    Widget body;
+    return ListenableBuilder(
+        listenable: store,
+        builder: (context, child) {
+          Widget body = Container();
+          final state = store.state;
 
-    if (isLoading) {
-      body = const Center(
-        child: CircularProgressIndicator(),
-      );
-    } else if (error.isNotEmpty) {
-      body = Center(
-        child: ElevatedButton(
-          onPressed: getPokemons,
-          child: Text('Erro: $error. Toque para tentar novamente'),
-        ),
-      );
-    } else if (pokemons.isEmpty) {
-      body = Center(
-        child: ElevatedButton(
-          onPressed: getPokemons,
-          child: const Text("Toque aqui para carregar os Pokémons"),
-        ),
-      );
-    } else {
-      body = ListView.builder(
-        itemCount: pokemons.length,
-        itemBuilder: (context, index) {
-          final pokemon = pokemons[index];
-          return ListTile(
-            title: Text(pokemon.name),
+          if (state is LoadingPokemonState) {
+            body = const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is ErrorPokemonState) {
+            body = Center(
+              child: ElevatedButton(
+                onPressed: store.getPokemons,
+                child: Text('Erro: $store.error. Toque para tentar novamente'),
+              ),
+            );
+          } else if (state is EmptyPokemonState) {
+            body = Center(
+              child: ElevatedButton(
+                onPressed: store.getPokemons,
+                child: const Text("Toque aqui para carregar os Pokémons"),
+              ),
+            );
+          } else if (state is GettedPokemonState) {
+            body = ListView.builder(
+              itemCount: state.pokemons.length,
+              itemBuilder: (context, index) {
+                final pokemon = state.pokemons[index];
+                return ListTile(
+                  title: Text(pokemon.name),
+                );
+              },
+            );
+          }
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Pokemon"),
+            ),
+            body: body,
           );
-        },
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Pokemon"),
-      ),
-      body: body,
-    );
+        });
   }
 }
+
+
+// import 'package:flutter/material.dart';
+// import 'package:gerencia_de_estado_raiz_2/pokemon_store.dart';
+
+// class HomePage extends StatelessWidget {
+//   HomePage({super.key});
+
+//   final store = PokemonStore();
+
+//   // @override
+//   // void initState() {
+//   //   super.initState();
+
+//   //   store.addListener(() {
+//   //     setState(() {});
+//   //   });
+//   // }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListenableBuilder(
+//         listenable: store,
+//         builder: (context, child) {
+//           Widget body = Container();
+//           final state = store.state;
+
+//           if (state.isLoading) {
+//             body = const Center(
+//               child: CircularProgressIndicator(),
+//             );
+//           } else if (state.error.isNotEmpty) {
+//             body = Center(
+//               child: ElevatedButton(
+//                 onPressed: store.getPokemons,
+//                 child: Text('Erro: $store.error. Toque para tentar novamente'),
+//               ),
+//             );
+//           } else if (state.pokemons.isEmpty) {
+//             body = Center(
+//               child: ElevatedButton(
+//                 onPressed: store.getPokemons,
+//                 child: const Text("Toque aqui para carregar os Pokémons"),
+//               ),
+//             );
+//           } else {
+//             body = ListView.builder(
+//               itemCount: state.pokemons.length,
+//               itemBuilder: (context, index) {
+//                 final pokemon = state.pokemons[index];
+//                 return ListTile(
+//                   title: Text(pokemon.name),
+//                 );
+//               },
+//             );
+//           }
+//           return Scaffold(
+//             appBar: AppBar(
+//               title: const Text("Pokemon"),
+//             ),
+//             body: body,
+//           );
+//         });
+//   }
+// }

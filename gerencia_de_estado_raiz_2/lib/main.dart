@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue, // Defina a cor do tema
       ),
-      home: const HomePage(), // Defina o HomePage como a tela inicial
+      home: HomePage(), // Defina o HomePage como a tela inicial
     );
   }
 }
