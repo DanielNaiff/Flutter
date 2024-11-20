@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:peleguard_web/home_controller.dart';
-import 'package:peleguard_web/home_page.dart';
+import 'package:gerencia_de_estado_raiz_1/home_controller.dart';
+import 'package:gerencia_de_estado_raiz_1/home_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
